@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Saarthak Trikha — Flight</title>
+<meta name="description" content="Saarthak Trikha — M.Tech Thermal & Propulsion, IIST. CFD, combustion and propulsion.">
+<script>document.documentElement.classList.add('js')</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;800&family=Archivo+Narrow:wght@500;600&display=swap" rel="stylesheet">
+<style>
+/*
+VOICE: an engineer's drawing sheet that becomes the sky — precise, quiet, one continuous ascent.
+IDEA: the page is the atmosphere; the rocket flies up the centre of the page, faint, behind the writing.
+PICTURE: line-drawn two-stage rocket, clouds then stars then Earth's limb drifting past behind the writing.
+COLOUR and TYPE: paper, pale sky, deep blue, night, space; flame orange accent; Archivo + Archivo Narrow.
+LAYOUT: centred content as in the Ascent version; the flight runs ghosted down the middle behind it; readout pinned bottom right.
+*/
+:root{color-scheme:light;--col:1080px;
+  --bg:#fbfbf8;--ink:#141414;--mute:#5b5f63;--line:#dcded8;--blue:#1f4bd8;--flame:#f2541b;--card:#ffffff}
+*{box-sizing:border-box;min-width:0}
+html{scroll-behavior:smooth;scroll-padding-top:64px;background:#05070d}
+body{margin:0;background:var(--bg);color:var(--ink);font:16.5px/1.6 Archivo,system-ui,sans-serif;overflow-x:clip}
+a{color:var(--blue);text-underline-offset:3px}
+a:focus-visible,summary:focus-visible{outline:2px solid var(--flame);outline-offset:3px;border-radius:3px}
+h1,h2,h3{margin:0;font-weight:800;text-wrap:balance;line-height:1.05}
+h2{font-size:clamp(28px,3.4vw,40px);margin:6px 0 28px}
+h3{font-size:18px;line-height:1.3}
+p{margin:0 0 12px;max-width:66ch}
+.label{font:600 13px/1.3 "Archivo Narrow",Archivo,sans-serif;color:var(--mute)}
+.ev{font:600 13px/1.3 "Archivo Narrow",sans-serif;color:var(--flame)}
+
+nav{position:sticky;top:0;z-index:10;height:56px;display:flex;align-items:center;gap:12px;padding:0 max(3vw,16px);background:rgba(251,251,248,.92);backdrop-filter:blur(8px);border-bottom:1px solid #dcded8}
+nav .me{font-weight:800;color:#141414;text-decoration:none;margin-right:auto;white-space:nowrap}
+nav .links{display:flex;overflow-x:auto}
+nav .links a{flex:none;color:#141414;text-decoration:none;padding:10px;font-size:15px;border-radius:6px}
+nav .links a:hover{background:#eef0ea}
+.mode{flex:none;display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:0 14px;border-radius:999px;border:1.5px solid #141414;background:transparent;color:#141414;font:600 14px Archivo,sans-serif;cursor:pointer}
+.mode svg{width:16px;height:16px;fill:currentColor}
+.mode:focus-visible{outline:2px solid var(--flame);outline-offset:3px}
+@media(max-width:430px){nav .links a[href='#about']{display:none}}
+@media(max-width:560px){nav .me{display:none}nav .links{margin:0 auto}.mode span{display:none}.mode{padding:0 11px}}
+[data-mode=dark] nav{background:rgba(13,16,20,.9);border-color:#252c35}
+[data-mode=dark] nav .me,[data-mode=dark] nav .links a{color:#e9ecef}
+[data-mode=dark] nav .links a:hover{background:#1b222b}
+[data-mode=dark] .mode{color:#e9ecef;border-color:#e9ecef}
+[data-mode=dark] #top,[data-mode=dark] #about,[data-mode=dark] #experience{--bg:#06080c;--ink:#eef1f6;--mute:#a7b2c3;--line:rgba(255,255,255,.14);--blue:#9cb7ff;--card:rgba(255,255,255,.04)}
+[data-mode=dark] #gl,[data-mode=dark] #pad path,[data-mode=dark] #pad g{stroke:#c9d1dc}
+[data-mode=dark] .cloud{fill:rgba(255,255,255,.06);stroke:#5b6b82}
+[data-mode=dark] .tb{background:#141a22;color:#e9ecef;border-color:#c9d1dc}
+[data-mode=dark] .tb div{border-color:#c9d1dc}
+[data-mode=dark] .tb span{color:#a7b2c3}
+[data-mode=dark] .also{background:rgba(255,255,255,.04)}
+[data-mode=dark] #projects,[data-mode=dark] #publications,[data-mode=dark] #education,[data-mode=dark] #contact{--card:rgba(255,255,255,.04)}
+[data-mode=dark] nav{background:rgba(6,8,12,.9)}
+
+/* bands of sky */
+main{position:relative;z-index:2}
+section{color:var(--ink);position:relative;padding:clamp(64px,8vw,120px) max(5vw,20px,calc((100% - var(--col)) / 2))}
+#sky{position:absolute;left:0;top:0;width:100%;z-index:0;pointer-events:none}
+#fx{position:fixed;inset:0;width:100%;height:100%;z-index:1;pointer-events:none}
+#experience{--line:#c3d1e6;--card:rgba(255,255,255,.6)}
+#projects,#publications,#education,#contact{--ink:#eef1f6;--mute:#a7b2c3;--line:rgba(255,255,255,.15);--blue:#9cb7ff;--card:rgba(10,20,40,.55)}
+#about .kit,#experience .xp,#experience .lead2{background:transparent}
+#contact{min-height:85vh}
+/* without scripts: plain bands, no flight */
+html:not(.js) #fx,html:not(.js) .tb,html:not(.js) #mode{display:none}
+html:not(.js) #top,html:not(.js) #about{background:#fbfbf8}
+html:not(.js) #experience{background:#e4edf8}
+html:not(.js) #projects{background:#17325f}
+html:not(.js) #publications{background:#0e1b36}
+html:not(.js) #education{background:#0a1225}
+html:not(.js) #contact{background:#05070d}
+/* telemetry */
+.tb{position:fixed;right:18px;bottom:18px;z-index:3;width:230px;background:#fbfbf8;color:#141414;border:1.5px solid #141414;display:grid;grid-template-columns:1fr 1fr;font-variant-numeric:tabular-nums;box-shadow:0 6px 18px rgba(0,0,0,.15);pointer-events:none}
+.tb div{padding:6px 10px;border-right:1px solid #141414;border-bottom:1px solid #141414}
+.tb div:nth-child(2n){border-right:0}
+.tb .w{grid-column:1/-1;border-right:0;border-bottom:0}
+.tb span{font:600 12px "Archivo Narrow",sans-serif;color:#5b5f63;display:block}
+.tb b{font-size:17px;white-space:nowrap}
+.tb .w b{font-size:14px;color:#f2541b;white-space:normal;line-height:1.25;display:block}
+
+/* hero */
+.hero{min-height:calc(100vh - 56px);display:flex;flex-direction:column;justify-content:center;padding-bottom:110px}
+.hero h1{font-size:clamp(48px,7vw,96px);letter-spacing:-.02em;margin-top:10px}
+.hero .role{font-size:clamp(18px,1.9vw,22px);margin:18px 0 0;max-width:44ch}
+.hero .role b{color:var(--flame);font-weight:600}
+.cta{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px}
+.btn{display:inline-flex;align-items:center;min-height:44px;padding:0 18px;border-radius:999px;border:1.5px solid var(--ink);color:var(--ink);text-decoration:none;font-weight:600;font-size:15px}
+.btn.solid{background:var(--ink);color:var(--bg)}
+.btn:hover{border-color:var(--flame)}
+.facts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));margin-top:clamp(32px,6vh,64px);border-top:1px solid var(--line);max-width:var(--col)}
+.facts div{padding:16px 16px 0 0}
+@media(max-width:760px){.facts{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.facts b{display:block;font-size:clamp(24px,2.6vw,34px);line-height:1.15}
+.cue{margin-top:30px;display:flex;align-items:center;gap:10px}
+.cue i{width:1.5px;height:34px;background:var(--flame);display:block;animation:cue 1.6s ease-in-out infinite;transform-origin:top}
+@keyframes cue{0%,100%{transform:scaleY(.2)}50%{transform:scaleY(1)}}
+
+/* about */
+.ab{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:clamp(24px,4vw,56px)}
+@media(max-width:1000px){.ab{grid-template-columns:minmax(0,1fr)}}
+.lead{font-size:clamp(19px,2vw,22px);line-height:1.5}
+.kit{display:grid;gap:12px}
+.kit div{padding-top:12px;border-top:1px solid var(--line)}
+.kit span:last-child{display:block;font-size:15.5px;margin-top:2px}
+
+/* experience */
+.xp{border-top:1px solid var(--line)}
+.xp details{border-bottom:1px solid var(--line)}
+.xp summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 16px;padding:18px 0;min-height:44px}
+.xp summary::-webkit-details-marker{display:none}
+.xp .when{font:600 14px "Archivo Narrow",sans-serif;color:var(--mute);white-space:nowrap;text-align:right}
+.xp .org{color:var(--mute);font-size:15px}
+.xp .one{grid-column:1/-1;font-size:15.5px;margin-top:4px}
+.xp .tog{grid-column:1/-1;font:600 13px "Archivo Narrow",sans-serif;color:var(--blue)}
+.xp .tog::after{content:"Details +"}
+.xp details[open] .tog::after{content:"Hide −"}
+.xp ul{margin:0 0 18px;padding-left:18px;font-size:15.5px}
+.xp li{margin:4px 0}
+.now{display:inline-block;margin-left:6px;font:600 12px "Archivo Narrow",sans-serif;color:#fff;background:var(--flame);padding:1px 8px;border-radius:999px;vertical-align:2px}
+.lead2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 28px}
+.lead2 div{padding:14px 0;border-top:1px solid var(--line)}
+.lead2 p{font-size:15px;margin:4px 0 0;color:var(--mute)}
+@media(max-width:640px){.lead2{grid-template-columns:minmax(0,1fr)}}
+
+/* projects */
+.feat{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,290px),1fr));gap:16px}
+.card{border:1px solid var(--line);border-radius:10px;overflow:hidden;display:flex;flex-direction:column;background:var(--card)}
+.card .art{height:92px;border-bottom:1px solid var(--line);background:rgba(255,255,255,.03)}
+.card .art svg{width:100%;height:100%;display:block}
+.card .body{padding:16px 18px 18px;display:flex;flex-direction:column;gap:8px;flex:1}
+.card p{font-size:15px;margin:0}
+.card .meta{margin-top:auto;padding-top:6px;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:center}
+.more{font-weight:600;font-size:15px;text-decoration:none}
+.more::after{content:" →"}
+.ink{stroke:var(--ink);fill:none;stroke-width:1.4}
+.bl{stroke:var(--blue);fill:none;stroke-width:1.4}
+.fl{fill:var(--flame)}.flS{stroke:var(--flame);fill:none;stroke-width:2}
+.also{margin-top:34px;border:1.5px dashed #9cb7ff;border-radius:12px;padding:22px clamp(16px,2.4vw,28px) 24px;background:rgba(23,50,95,.75)}
+.also .hd{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.also .hd h3{font-size:22px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,240px),1fr));gap:12px}@media(max-width:700px){.tiles{grid-template-columns:minmax(0,1fr)}}
+.tile{display:grid;grid-template-columns:40px minmax(0,1fr);gap:12px;padding:14px;border-radius:8px;background:rgba(255,255,255,.06);border:1px solid var(--line)}
+.tile svg{width:40px;height:40px}
+.tile b{display:block;font-size:16px;line-height:1.25}
+.tile p{font-size:14.5px;margin:4px 0 0;color:var(--mute)}
+.tile a{font-size:14.5px;font-weight:600}
+
+/* papers, education */
+.pub{padding:16px 0;border-top:1px solid var(--line)}
+.pub .t{font-weight:600;line-height:1.35}
+.pub .v{color:var(--mute);font-size:14.5px;margin-top:4px}
+.two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:48px}
+@media(max-width:760px){.two{grid-template-columns:minmax(0,1fr)}}
+.edu{padding:14px 0;border-top:1px solid var(--line)}
+.edu .org{color:var(--mute);font-size:15px}
+.edu .cw{font-size:14.5px;color:var(--mute);margin-top:6px}
+.hon{list-style:none;padding:0;margin:0}
+.hon li{padding:10px 0;border-top:1px solid var(--line);font-size:15.5px}
+
+/* contact */
+.contact h2{font-size:clamp(34px,5vw,60px)}
+.mail{font-size:clamp(19px,2.6vw,28px);font-weight:600;overflow-wrap:anywhere}
+
+@media(max-width:760px){
+  .tb{left:0;right:0;bottom:0;width:auto;border:0;border-top:1.5px solid #141414;box-shadow:none;display:flex;justify-content:space-between;gap:10px;padding:6px 14px;padding-bottom:max(6px,env(safe-area-inset-bottom))}
+  .tb div{padding:0;border:0!important;display:flex;gap:6px;align-items:baseline}
+  .tb .hide{display:none}
+  .tb .w{display:flex;min-width:0}
+  .tb .w b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:13px}
+  .tb b{font-size:13px}.tb span{font-size:11px}
+  .tb .w span{display:none}
+  main{padding-bottom:36px}
+  nav{padding:0 8px}nav .links a{padding:10px 7px;font-size:14px}
+  .tb{justify-content:flex-start;gap:16px}
+}
+.flick{animation:fk .12s steps(2) infinite alternate;transform-box:fill-box;transform-origin:50% 0}
+.cloud{fill:rgba(255,255,255,.55);stroke:#9aa7ba;stroke-width:1.1}
+@keyframes fk{from{transform:scaleY(.9)}to{transform:scaleY(1.08)}}
+@media(prefers-reduced-motion:reduce){.flick,.cue i{animation:none}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<nav>
+  <a class="me" href="#top">Saarthak Trikha</a>
+  <div class="links"><a href="#about">About</a><a href="#experience">Experience</a><a href="#projects">Projects</a><a href="#publications">Papers</a><a href="#contact">Contact</a></div>
+  <button id="mode" class="mode" type="button" aria-pressed="false"><svg viewBox="0 0 20 20" aria-hidden="true"><path id="mi" d="M14.5 12.5A6.5 6.5 0 0 1 7.5 3.5a6.5 6.5 0 1 0 7 9z"/></svg><span id="ml">Dark mode</span></button>
+</nav>
+
+<div id="sky" aria-hidden="true"></div>
+<svg id="fx" aria-hidden="true">
+  <defs>
+    <pattern id="hat" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="8" stroke="#9aa0a6" stroke-width="1"/></pattern>
+    <linearGradient id="trail" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffd166"/><stop offset=".15" stop-color="#ff6a2b" stop-opacity=".85"/><stop offset="1" stop-color="#ff6a2b" stop-opacity="0"/></linearGradient>
+    <linearGradient id="eg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2f6fd6"/><stop offset="1" stop-color="#0c2550"/></linearGradient>
+  </defs>
+  <g id="stars" fill="#fff" opacity="0"></g>
+  <g id="clouds"></g>
+  <g id="earth" opacity="0"><ellipse id="atm" fill="#5aa0ff" opacity=".22"/><ellipse id="globe" fill="url(#eg)" stroke="#8fc0ff" stroke-width="1.5"/></g>
+  <g id="ground"><rect id="gh" fill="url(#hat)"/><line id="gl" stroke="#141414" stroke-width="1.6"/>
+    <g id="pad"><path d="M-42 0 L-32 -16 L32 -16 L42 0 Z" fill="#eef0ea" stroke="#141414" stroke-width="1.4"/>
+      <g stroke="#141414" stroke-width="1.2" fill="none"><path d="M50 -16 V-310 M68 -16 V-310 M50 -310 H68"/><path d="M50 -16 L68 -46 L50 -76 L68 -106 L50 -136 L68 -166 L50 -196 L68 -226 L50 -256 L68 -286 L50 -310"/><path d="M50 -220 H24 M50 -130 H24" stroke="#1f4bd8"/></g>
+      <g id="smoke" fill="#9aa0a6" opacity="0"></g></g></g>
+  <g id="rkw"><g id="rk">
+    <g id="s2">
+      <g id="tr2" opacity="0"><rect x="-8" y="38" width="16" height="520" fill="url(#trail)"/><path class="flick" d="M-7 36 Q0 74 7 36 Z" fill="#ffd166"/></g>
+      <path d="M-6 20 C-7 28 -9 32 -11 37 L11 37 C9 32 7 28 6 20 Z" fill="#c9ccd1" stroke="#141414" stroke-width="1.3"/>
+      <rect x="-15" y="-62" width="30" height="82" fill="#f6f6f2" stroke="#141414" stroke-width="1.3"/>
+      <rect x="-15" y="-62" width="30" height="7" fill="#2a2f36"/>
+      <path d="M-15 -14 H15" stroke="#1f4bd8"/><path d="M8 -55 V20" stroke="#b4b8bd" stroke-width="1"/>
+    </g>
+    <g id="pl">
+      <g id="wings" transform="translate(0 -100) scale(0 1)"><rect x="-60" y="-6" width="42" height="12" fill="#1f4bd8" stroke="#141414"/><rect x="18" y="-6" width="42" height="12" fill="#1f4bd8" stroke="#141414"/><path d="M-46 -6V6M-32 -6V6M32 -6V6M46 -6V6" stroke="#9db4ff"/></g>
+      <path d="M-9 -70 L9 -70 L12 -62 L-12 -62 Z" fill="#9aa0a6" stroke="#141414" stroke-width="1.2"/>
+      <rect x="-11" y="-118" width="22" height="48" rx="2" fill="#f2c14e" stroke="#141414" stroke-width="1.3"/>
+      <path d="M-11 -100 H11 M-11 -86 H11" stroke="#b8862a"/><path d="M0 -118 V-130 M-4 -130 H4" stroke="#141414" stroke-width="1.3"/>
+    </g>
+    <g id="s1">
+      <g id="tr1" opacity="0"><rect x="-12" y="172" width="24" height="700" fill="url(#trail)"/><path class="flick" d="M-11 170 Q0 228 11 170 Z" fill="#ffd166"/></g>
+      <path d="M-8 150 C-9 158 -13 165 -16 172 L16 172 C13 165 9 158 8 150 Z" fill="#c9ccd1" stroke="#141414" stroke-width="1.3"/>
+      <path d="M-11 172 L11 172" stroke="#141414" stroke-width="2"/>
+      <rect x="-17" y="20" width="34" height="130" fill="#f6f6f2" stroke="#141414" stroke-width="1.3"/>
+      <rect x="-17" y="20" width="34" height="12" fill="#2a2f36"/>
+      <path d="M-17 132 L-26 156 L-17 150 Z M17 132 L26 156 L17 150 Z" fill="#f6f6f2" stroke="#141414" stroke-width="1.3"/>
+      <path d="M-17 92 H17" stroke="#1f4bd8"/><path d="M10 32 V150" stroke="#b4b8bd" stroke-width="1"/>
+      <g id="bL">
+        <g class="btr" opacity="0"><rect x="-30" y="166" width="10" height="360" fill="url(#trail)"/><path class="flick" d="M-30 164 Q-25 196 -20 164 Z" fill="#ffd166"/></g>
+        <path d="M-27 72 C-27 60 -22 54 -22 54 C-22 54 -17 60 -17 72 Z" fill="#f6f6f2" stroke="#141414" stroke-width="1.2"/>
+        <rect x="-27" y="72" width="10" height="84" fill="#f6f6f2" stroke="#141414" stroke-width="1.2"/>
+        <path d="M-26 156 L-28 165 L-16 165 L-18 156 Z" fill="#c9ccd1" stroke="#141414" stroke-width="1.1"/>
+        <path d="M-27 80 H-17" stroke="#f2541b" stroke-width="2"/>
+      </g>
+      <g id="bR">
+        <g class="btr" opacity="0"><rect x="20" y="166" width="10" height="360" fill="url(#trail)"/><path class="flick" d="M20 164 Q25 196 30 164 Z" fill="#ffd166"/></g>
+        <path d="M17 72 C17 60 22 54 22 54 C22 54 27 60 27 72 Z" fill="#f6f6f2" stroke="#141414" stroke-width="1.2"/>
+        <rect x="17" y="72" width="10" height="84" fill="#f6f6f2" stroke="#141414" stroke-width="1.2"/>
+        <path d="M18 156 L16 165 L28 165 L26 156 Z" fill="#c9ccd1" stroke="#141414" stroke-width="1.1"/>
+        <path d="M17 80 H27" stroke="#f2541b" stroke-width="2"/>
+      </g>
+    </g>
+    <path id="fl" d="M0 -172 C-9 -162 -19 -144 -19 -116 L-19 -70 L-15 -62 L0 -62 Z" fill="#f6f6f2" stroke="#141414" stroke-width="1.3"/>
+    <path id="fr" d="M0 -172 C9 -162 19 -144 19 -116 L19 -70 L15 -62 L0 -62 Z" fill="#f6f6f2" stroke="#141414" stroke-width="1.3"/>
+    <path id="fs" d="M0 -172 V-62" stroke="#141414" stroke-width=".8" stroke-dasharray="3 3"/>
+  </g></g>
+</svg>
+<div class="tb" aria-hidden="true">
+  <div class="hide"><span>T+</span><b id="tT">00:00</b></div>
+  <div><span>Altitude</span><b id="tA">0 km</b></div>
+  <div class="hide"><span>Velocity</span><b id="tV">0.00 km/s</b></div>
+  <div class="hide"><span>Stage</span><b id="tS">1</b></div>
+  <div class="w"><span>Event</span><b id="tE">On the pad</b></div>
+</div>
+<main>
+<section id="top" class="hero">
+  <span class="ev">T−00:10 · Countdown</span>
+  <h1>Saarthak Trikha</h1>
+  <p class="role">Aerospace engineer in <b>thermal &amp; propulsion</b>. M.Tech at IIST, working on afterburners and exhaust systems at GTRE, DRDO.</p>
+  <div class="cta">
+    <a class="btn solid" href="#projects">See projects</a>
+    <a class="btn" href="https://www.linkedin.com/in/saarthaktrikha/">LinkedIn</a>
+    <a class="btn" href="https://github.com/saarthakbunny">GitHub</a>
+  </div>
+  <div class="facts">
+    <div><b>5</b><span class="label">Internships, incl. GTRE, ADA and DRDO</span></div>
+    <div><b>4</b><span class="label">Conference papers</span></div>
+    <div><b>AIR 380</b><span class="label">GATE 2025, Aerospace</span></div>
+    <div><b>NASA HERC</b><span class="label">System Safety Award 2021</span></div>
+  </div>
+  <div class="cue"><i></i><span class="label">Scroll to launch</span></div>
+</section>
+
+<section id="about">
+  <span class="ev">T+00:05 · Liftoff</span>
+  <h2>About</h2>
+  <div class="ab">
+    <div>
+      <p class="lead">I like problems where fluid dynamics, heat and hardware meet.</p>
+      <p>I'm finishing an M.Tech in Thermal &amp; Propulsion at the Indian Institute of Space Science and Technology, after a B.Tech in Aerospace Engineering from Amity University. My final-year project is in GTRE's Afterburners and Exhaust Systems Division, running reacting-flow CFD and working on liner cooling and nozzle design.</p>
+      <p>Outside the lab I build things: RC aircraft, a hovercraft, model rockets, a neural-network surrogate for nozzle design and the trajectory simulator this page borrows its orbit from.</p>
+    </div>
+    <div class="kit">
+      <div><span class="label">Simulation</span><span>ANSYS Fluent, CFX, Structural &amp; Thermal · STAR-CCM+ · OpenFOAM · HyperWorks · MATLAB &amp; Simulink</span></div>
+      <div><span class="label">CAD</span><span>Siemens NX · CATIA V5 · SolidWorks · Fusion 360 · AutoCAD</span></div>
+      <div><span class="label">Analysis</span><span>Reacting flow · heat transfer · FSI · modal analysis · optimisation · surrogate models · trajectory simulation</span></div>
+      <div><span class="label">Languages</span><span>English · Hindi · German (elementary)</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="experience">
+  <span class="ev">T+01:10 · Max-Q</span>
+  <h2>Experience</h2>
+  <div class="xp">
+    <details>
+      <summary><div><h3>Project Intern <span class="now">Now</span></h3><div class="org">Gas Turbine Research Establishment, DRDO</div></div><div class="when">Jun 2026 –</div>
+        <div class="one">Reacting-flow CFD, liner cooling and nozzle design for afterburners.</div><div class="tog"></div></summary>
+      <ul>
+        <li>Reacting-flow and heat-transfer analysis of afterburners in ANSYS Fluent, including combustion liner cooling.</li>
+        <li>Supporting optimisation of liner geometry and cooling configurations.</li>
+        <li>Automated fuel-injector sizing and placement calculations in MATLAB.</li>
+        <li>Design, FSI analysis and optimisation of the afterburner nozzle.</li>
+      </ul>
+    </details>
+    <details>
+      <summary><div><h3>Engineering Intern</h3><div class="org">Asteria Aerospace</div></div><div class="when">Jul – Aug 2024</div>
+        <div class="one">Crash-log analysis and flight testing for military-grade drones.</div><div class="tog"></div></summary>
+      <ul>
+        <li>Traced root causes from crash logs and implemented fixes.</li>
+        <li>Planned and ran flight tests, recording data against safety and performance standards.</li>
+        <li>Wrote technical documentation and troubleshooting procedures.</li>
+      </ul>
+    </details>
+    <details>
+      <summary><div><h3>Research Intern</h3><div class="org">Aeronautical Development Agency</div></div><div class="when">May – Jun 2023</div>
+        <div class="one">Exhaust nozzle work that raised engine efficiency by 3.2%.</div><div class="tog"></div></summary>
+      <ul>
+        <li>Improved exhaust nozzles and internal pressure ratios, raising engine efficiency by 3.2%.</li>
+        <li>Reviewed active adaptive nozzles and proposed shape-memory alloys for real-time geometry change.</li>
+        <li>Designed and simulated a supersonic C-D nozzle.</li>
+      </ul>
+    </details>
+    <details>
+      <summary><div><h3>Research Intern</h3><div class="org">Advanced Systems Laboratory, DRDO</div></div><div class="when">Jun – Jul 2022</div>
+        <div class="one">Modal analysis of a self-designed launch vehicle.</div><div class="tog"></div></summary>
+      <ul>
+        <li>Designed and modelled a preliminary launch vehicle in Fusion 360.</li>
+        <li>Calculated its natural frequencies and checked how propulsion-induced vibration interacts with its modes.</li>
+      </ul>
+    </details>
+  </div>
+  <h3 class="label" style="margin:40px 0 8px">Teams, teaching &amp; leadership</h3>
+  <div class="lead2">
+    <div><h3>Mentor · Project Polaris</h3><p>2026 – now · Teaching astronautics, aeronautics and engineering systems.</p></div>
+    <div><h3>Simulation Head · JarWiz</h3><p>2021 – 24 · NASA HERC rover team; System Safety Award 2021.</p></div>
+    <div><h3>Rocketry Head · Airbenders</h3><p>2023 – 24 · Water, model and B/C-class solid rockets; RC aircraft and workshops.</p></div>
+    <div><h3>Space Ambassador · Spaceonova</h3><p>2021 – 22 · Outreach and student webinars, Delhi-NCR.</p></div>
+  </div>
+</section>
+
+<section id="projects">
+  <span class="ev">T+02:40 · Stage separation</span>
+  <h2>Projects</h2>
+  <div class="feat">
+    <article class="card">
+      <div class="art"><svg viewBox="0 0 340 100" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><path d="M30 30 L120 30 C150 30 160 48 180 48 L310 40" class="ink"/><path d="M30 70 L120 70 C150 70 160 52 180 52 L310 60" class="ink"/><g class="bl"><circle cx="230" cy="18" r="4"/><circle cx="250" cy="12" r="4"/><circle cx="270" cy="22" r="4"/><circle cx="290" cy="10" r="4"/><path d="M230 18 L250 12 L270 22 L290 10" stroke-dasharray="2 3"/></g><path d="M180 88 C220 86 260 80 310 72" class="flS"/></svg></div>
+      <div class="body"><h3>Neural-network predictor for C-D nozzles</h3>
+        <p>Surrogate built from scratch in MATLAB on 50+ Latin-hypercube Fluent runs; does forward and inverse design, deployed as a live web app.</p>
+        <div class="meta"><span class="label">MATLAB · Fluent · ML</span><a class="more" href="https://github.com/saarthakbunny/CD-Nozzle-Solver">GitHub</a></div></div>
+    </article>
+    <article class="card">
+      <div class="art"><svg viewBox="0 0 340 100" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><path d="M0 96 Q170 80 340 96" class="ink"/><path d="M40 90 C60 50 120 20 300 14" class="bl" stroke-dasharray="5 4"/><circle cx="300" cy="14" r="4" class="fl"/></svg></div>
+      <div class="body"><h3>3-DOF launch vehicle trajectory simulator</h3>
+        <p>Two-stage liquid rocket for 1000 kg to a 600 km orbit, with an RK4 ascent simulator and self-tuning four-phase pitch guidance.</p>
+        <div class="meta"><span class="label">MATLAB · Mission design</span><a class="more" href="https://drive.google.com/drive/folders/1nxLvYQVK6WYJrzscq9G4zCwMPzFWGxuZ?usp=drive_link">Files</a></div></div>
+    </article>
+    <article class="card">
+      <div class="art"><svg viewBox="0 0 340 100" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><path d="M20 86 L320 86" class="ink"/><path d="M20 82 C120 80 170 74 320 70" class="bl" stroke-dasharray="4 3"/><path d="M120 10 L200 84" class="flS"/><path d="M200 84 L250 20" class="flS" stroke-dasharray="5 4"/><path d="M150 86 L158 76 L166 86" class="ink"/></svg></div>
+      <div class="body"><h3>Shock-wave/boundary-layer interaction control</h3>
+        <p>CFD studies of vortex generators, air-jet injection, inlet size and back pressure for supersonic intakes — the basis of three papers.</p>
+        <div class="meta"><span class="label">Fluent · Supersonic flow</span><a class="more" href="#publications">Papers</a></div></div>
+    </article>
+    <article class="card">
+      <div class="art"><svg viewBox="0 0 340 100" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><path d="M60 50 L280 50" class="ink"/><path d="M160 50 L210 14 L230 14 L200 50 M160 50 L210 86 L230 86 L200 50" class="ink"/><path d="M255 50 L272 36 L280 36 L270 50 M255 50 L272 64 L280 64 L270 50" class="ink"/><path d="M100 50 L118 43 L118 57 Z" class="bl"/><path d="M36 50 L56 50" class="flS"/></svg></div>
+      <div class="body"><h3>SU-47 forward-swept model aircraft</h3>
+        <p>Built a forward-swept RC aircraft on the Su-47 planform, flew it five times and logged its flight characteristics on each flight.</p>
+        <div class="meta"><span class="label">Fabrication · Flight testing</span><a class="more" href="https://drive.google.com/drive/folders/1QH4QAyrEAWodlfyNZCURlSwxAE7hz7eo">Photos</a></div></div>
+    </article>
+    <article class="card">
+      <div class="art"><svg viewBox="0 0 340 100" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><path d="M70 78 L240 78" class="ink"/><path d="M110 78 L130 32 L150 32 L170 78" class="ink"/><circle cx="140" cy="26" r="9" class="ink"/><circle cx="96" cy="82" r="14" class="ink"/><circle cx="196" cy="82" r="14" class="ink"/><path d="M170 58 L230 58" class="bl"/><path d="M262 22 l10 10 l14 -18" class="flS"/></svg></div>
+      <div class="body"><h3>NASA Human Exploration Rover Challenge</h3>
+        <p>Simulation head for JarWiz: 50+ simulations, fatigue analysis, FMEA and PHA. System Safety Award, HERC 2021.</p>
+        <div class="meta"><span class="label">Structures · Safety</span></div></div>
+    </article>
+    <article class="card">
+      <div class="art"><svg viewBox="0 0 340 100" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect x="110" y="14" width="120" height="76" rx="4" class="ink"/><path d="M124 32 L190 32 M124 46 L216 46 M124 56 L206 56 M124 70 L170 70 M124 80 L200 80" class="bl"/><circle cx="210" cy="28" r="8" class="fl"/></svg></div>
+      <div class="body"><h3>CueCairn</h3>
+        <p>A career platform I'm building: free resume builder from templates, personal workspaces and interview prep, plus resume and portfolio services.</p>
+        <div class="meta"><span class="label">Web development · Product</span><a class="more" href="https://cuecairn.in/">cuecairn.in</a></div></div>
+    </article>
+  </div>
+
+  <div class="also">
+    <div class="hd"><h3>Also built</h3><span class="label">Hands-on builds and competitions</span></div>
+    <div class="tiles">
+      <div class="tile"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M4 14 H36 M16 14 L22 6 L26 6 L22 14 M16 14 L22 22 L26 22 L22 14" class="ink"/><rect x="18" y="30" width="7" height="6" class="fl"/><path d="M21 17 V27" class="bl" stroke-dasharray="2 2"/></svg>
+        <div><b>Payload dropper</b><p>RC trainer modified to release a 200 g payload mid-flight without losing stability.</p></div></div>
+      <div class="tile"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M4 26 Q20 20 36 26 L34 32 Q20 35 6 32 Z" class="ink"/><circle cx="30" cy="16" r="6" class="ink"/><path d="M8 36 Q20 39 32 36" class="flS"/></svg>
+        <div><b>Hovercraft</b><p>Lift fan, skirt and ducted props; held a 7 cm hover at IIT Kanpur's Techkriti '23.</p></div></div>
+      <div class="tile"><svg viewBox="0 0 40 40" aria-hidden="true"><rect x="5" y="11" width="27" height="18" rx="3" class="ink"/><rect x="32" y="16" width="4" height="8" class="ink"/><path d="M20 13 L14 21 L19 21 L16 28 L24 19 L19 19 Z" class="fl"/></svg>
+        <div><b>Shell E4 Challenge</b><p>Pitched an energy solution to Shell executives and investors — silver medal.</p></div></div>
+      <div class="tile"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M2 30 H38" class="ink"/><g class="bl"><circle cx="8" cy="30" r="2.5"/><circle cx="32" cy="30" r="2.5"/></g><circle cx="20" cy="30" r="3" class="fl"/><rect x="16" y="8" width="8" height="7" class="ink"/><path d="M6 11.5 H16 M24 11.5 H34" class="bl"/></svg>
+        <div><b>NASA Space Apps</b><p>Interactive timeline of 100+ NASA satellite missions.</p><a href="https://drive.google.com/file/d/190keFIkkaAFxrwT8AswLjHLHYkG_2Pjv/view">Write-up →</a></div></div>
+    </div>
+  </div>
+</section>
+
+<section id="publications">
+  <span class="ev">T+04:00 · Fairing separation</span>
+  <h2>Publications</h2>
+  <div class="pub"><div class="t">Computational Analysis of Shock Wave Boundary Layer Control using Novel Arrangements of Vane-type Vortex Generator</div><div class="v">Trikha &amp; Mukherjee · FLAME 4, 2024 · <a href="https://doi.org/10.1007/978-981-96-9521-8_44">DOI</a></div></div>
+  <div class="pub"><div class="t">Numerical Study of Shock-Wave Boundary-Layer Interaction Control using Variable Pressure and Inlet Size</div><div class="v">Trikha, Sehgal &amp; Gaur · FLAME 4, 2024, pp. 277–290 · <a href="https://doi.org/10.1007/978-981-96-8500-4_23">DOI</a></div></div>
+  <div class="pub"><div class="t">Impact of Turbulence Modeling on Supersonic Air Intake</div><div class="v">Gahlot, Saluja &amp; Trikha · FLAME 4, 2024 · in press</div></div>
+  <div class="pub"><div class="t">Comparative Study of Natural Frequency of a C-141A-II Airfoil Wing and Cantilever Beam: Simulation and Experimental Investigation</div><div class="v">Sehgal &amp; Trikha · ICMRAE 2, 2023, pp. 336–353 · <a href="https://doi.org/10.1007/978-981-97-1306-6_28">DOI</a></div></div>
+</section>
+
+<section id="education">
+  <span class="ev">T+07:30 · Engine cutoff</span>
+  <div class="two">
+    <div><h2>Education</h2>
+      <div class="edu"><h3>M.Tech, Aerospace Engineering — Thermal &amp; Propulsion</h3><div class="org">Indian Institute of Space Science and Technology, Thiruvananthapuram · 2025 – present</div>
+        <div class="cw">Aerospace propulsion, heat transfer, combustion, CFD, space mission design</div></div>
+      <div class="edu"><h3>B.Tech, Aerospace Engineering</h3><div class="org">Amity University, Noida · 2020 – 2024</div>
+        <div class="cw">Aerodynamics, structures, aircraft design and performance, stability and control, automatic flight control</div></div>
+    </div>
+    <div><h2>Honours &amp; certificates</h2>
+      <ul class="hon">
+        <li>GATE 2025, Aerospace Engineering — All India Rank 380 (score 466)</li>
+        <li>System Safety Award, NASA Human Exploration Rover Challenge 2021</li>
+        <li>Silver medal, Shell E4 Challenge</li>
+        <li>World rank 32, Solar System Astronomy Quiz — International Astronomy and Space Olympiad</li>
+        <li>Bronze medal, International Youth Math Challenge (IYMC)</li>
+        <li>First runner-up, Science Quiz</li>
+        <li>Certificates: Digitalization in Space Research; Introduction to Philosophy; EF SET English (82/100)</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="contact" class="contact">
+  <div>
+    <span class="ev">T+09:00 · Orbit reached</span>
+    <h2>Let's talk propulsion.</h2>
+    <p>Open to roles and research in CFD, combustion, and gas turbine or rocket propulsion.</p>
+    <p class="mail"><a href="mailto:saarthak2trikha@gmail.com">saarthak2trikha@gmail.com</a></p>
+    <div class="cta"><a class="btn" href="https://www.linkedin.com/in/saarthaktrikha/">LinkedIn</a><a class="btn" href="https://github.com/saarthakbunny">GitHub</a></div>
+    <p class="label" style="margin-top:32px">Bengaluru, India · Drawn and flown by Saarthak Trikha</p>
+  </div>
+  </section>
+</main>
+
+<script>
+{
+const $=id=>document.getElementById(id);
+const C=x=>Math.max(0,Math.min(1,x)),ease=t=>t*t*(3-2*t);
+const fx=$('fx'),sky=$('sky');
+const light={top:'#fbfbf8',about:'#fbfbf8',experience:'#e4edf8'},dark={top:'#06080c',about:'#06080c',experience:'#06080c',projects:'#06080c',publications:'#06080c',education:'#06080c',contact:'#06080c'};
+const lightRest={projects:'#17325f',publications:'#0e1b36',education:'#0a1225',contact:'#05070d'};
+const cols={top:'#fbfbf8',about:'#fbfbf8',experience:'#e4edf8',projects:'#17325f',publications:'#0e1b36',education:'#0a1225',contact:'#05070d'};
+const ids=Object.keys(cols),keys=[0,.03,.12,.46,.7,.86,.93];
+const E={};['stars','clouds','earth','atm','globe','ground','gh','gl','pad','smoke','rkw','rk','s1','s2','tr1','tr2','fl','fr','fs','wings','bL','bR'].forEach(k=>E[k]=$(k));
+let seed=11;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
+const starD=[...Array(170)].map(()=>[rnd(),rnd(),rnd()*1.3+.3,rnd()*.6+.4]);
+const cloudD=[...Array(9)].map(()=>[rnd(),-1.9+rnd()*1.8,.9+rnd()*1.4]);
+let W,H,tops=[],geo={};
+const root=document.documentElement,mb=$('mode');
+function setMode(m){
+  root.dataset.mode=m;Object.assign(cols,m==='dark'?dark:{...light,...lightRest});
+  mb.setAttribute('aria-pressed',m==='dark');$('ml').textContent=m==='dark'?'Light mode':'Dark mode';
+  $('mi').setAttribute('d',m==='dark'?'M10 5.5a4.5 4.5 0 1 1 0 9a4.5 4.5 0 0 1 0-9zM10 1v2.5M10 16.5V19M1 10h2.5M16.5 10H19M3.6 3.6l1.8 1.8M14.6 14.6l1.8 1.8M3.6 16.4l1.8-1.8M14.6 5.4l1.8-1.8':'M14.5 12.5A6.5 6.5 0 0 1 7.5 3.5a6.5 6.5 0 1 0 7 9z');
+  $('mi').setAttribute('stroke',m==='dark'?'currentColor':'none');$('mi').setAttribute('stroke-width','1.6');
+  try{localStorage.setItem('st-mode',m)}catch(e){}
+  if(W)layout();
+}
+let saved=null;try{saved=localStorage.getItem('st-mode')}catch(e){}
+setMode(saved||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));
+mb.addEventListener('click',()=>setMode(root.dataset.mode==='dark'?'light':'dark'));
+let sm='';for(let i=0;i<7;i++)sm+=`<circle data-x="${(i-3)*16}" cx="${(i-3)*16}" cy="-6" r="8"/>`;
+E.smoke.innerHTML=sm;const puffs=[...E.smoke.children];
+const cloudPath='M0 0 a18 18 0 0 1 30 -14 a24 24 0 0 1 44 4 a16 16 0 0 1 22 18 Z';
+function layout(){
+  W=innerWidth;H=innerHeight;
+  fx.setAttribute('viewBox',`0 0 ${W} ${H}`);
+  const docH=document.documentElement.scrollHeight;
+  tops=ids.map(id=>$(id).getBoundingClientRect().top+scrollY);
+  const g=[`${cols.top} 0px`];
+  ids.forEach((id,i)=>{if(i)g.push(`${cols[ids[i-1]]} ${tops[i]-70}px`,`${cols[id]} ${tops[i]+40}px`)});
+  sky.style.height=docH+'px';sky.style.background=`linear-gradient(${g.join(',')})`;
+  const open=false,colR=0,free=W;
+  geo={open,rx:W/2,k:Math.max(.6,Math.min(1.15,H/800))*(W<700?.8:1),gy:H-24};
+  const dk=root.dataset.mode==='dark';E.rkw.setAttribute('opacity',W<700?(dk?.3:.22):(dk?.45:.3));
+  E.gh.setAttribute('x',-10);E.gh.setAttribute('y',geo.gy);E.gh.setAttribute('width',W+20);E.gh.setAttribute('height',H);
+  E.gl.setAttribute('x1',-10);E.gl.setAttribute('x2',W+10);E.gl.setAttribute('y1',geo.gy);E.gl.setAttribute('y2',geo.gy);
+  E.pad.setAttribute('transform',`translate(${geo.rx} ${geo.gy}) scale(${geo.k})`);
+  E.pad.setAttribute('opacity',.35);
+  E.stars.innerHTML=starD.map(([x,y,r,o])=>`<circle cx="${(x*W).toFixed(1)}" cy="${(y*H).toFixed(1)}" r="${r.toFixed(2)}" opacity="${o.toFixed(2)}"/>`).join('');
+  E.clouds.setAttribute('opacity',.45);
+  E.clouds.innerHTML=cloudD.map(([x,y,s])=>`<path class="cloud" d="${cloudPath}" data-x="${(open?colR+20+x*(free-180):x*W-40).toFixed(1)}" data-y="${(y*H).toFixed(1)}" data-s="${s.toFixed(2)}"/>`).join('');
+  const rx=W*.95,ry=Math.max(H*.45,W*.18);
+  E.globe.setAttribute('rx',rx);E.globe.setAttribute('ry',ry);E.globe.setAttribute('cx',W/2);
+  E.atm.setAttribute('rx',rx+18);E.atm.setAttribute('ry',ry+18);E.atm.setAttribute('cx',W/2);
+  geo.ery=ry;
+  goal=target();render(cur=goal);
+}
+function target(){
+  const y=scrollY+H*.5,xs=tops.slice(),ys=keys.slice();
+  xs[0]=H*.5;xs.push(document.documentElement.scrollHeight-H*.5);ys.push(1);
+  for(let i=1;i<xs.length;i++)if(xs[i]<=xs[i-1])xs[i]=xs[i-1]+1;
+  if(y<=xs[0])return 0;
+  for(let i=0;i<xs.length-1;i++)if(y<xs[i+1])return ys[i]+(ys[i+1]-ys[i])*(y-xs[i])/(xs[i+1]-xs[i]);
+  return 1;
+}
+const T=(e,v)=>e.setAttribute('transform',v),O=(e,v)=>e.setAttribute('opacity',(+v).toFixed(3));
+const ev=[[0,'On the pad'],[.015,'Ignition and liftoff'],[.12,'Max-Q'],[.24,'Strap-on booster separation'],[.4,'Main engine cutoff'],[.46,'Stage separation'],[.5,'Second-stage ignition'],[.7,'Fairing separation'],[.86,'Second-stage cutoff'],[.9,'Payload deployed in a 600 km orbit']];
+function render(p){
+  const {rx,k,gy}=geo;
+  const q=C((p-.015)/.875),alt=600*(1-(1-q)**2),vel=7.56*Math.pow(q,.85);
+  const t=Math.round(q*540+(p>.89?(p-.89)*900:0));
+  const lift=ease(C((p-.015)/.1));
+  T(E.ground,`translate(0 ${(lift*H*.7).toFixed(1)})`);O(E.ground,1-C((p-.07)/.05));
+  const s=C(p/.06);O(E.smoke,p<.2?.4*(1-C((p-.05)/.08)):0);
+  puffs.forEach(c=>{const d=+c.dataset.x;c.setAttribute('cx',(d*(1+s*1.6)).toFixed(1));c.setAttribute('r',(8+s*18).toFixed(1))});
+  const cl=C((p-.02)/.4);
+  for(const c of E.clouds.children)T(c,`translate(${c.dataset.x} ${(+c.dataset.y+cl*H*3).toFixed(1)}) scale(${c.dataset.s})`);
+  O(E.stars,C((p-.42)/.15)*.9);T(E.stars,`translate(0 ${(p*70).toFixed(1)})`);
+  const e=ease(C((p-.84)/.16));O(E.earth,C((p-.84)/.05));
+  const ey=H+geo.ery-e*H*.2;E.globe.setAttribute('cy',ey);E.atm.setAttribute('cy',ey);
+  const y0=gy-16*k-172*k*.9,y1=H*.52,y=y0+(y1-y0)*lift,ang=50*ease(C((p-.1)/.8));
+  T(E.rk,`translate(${rx.toFixed(1)} ${y.toFixed(1)}) rotate(${ang.toFixed(2)}) scale(${(k*.9).toFixed(3)})`);
+  O(E.tr1,p>.015&&p<.4?1:0);
+  const bs=C((p-.24)/.16);
+  for(const b of document.querySelectorAll('.btr'))O(b,p>.015&&p<.24?1:0);
+  T(E.bL,`translate(${(-bs*70).toFixed(1)} ${(bs*260).toFixed(1)}) rotate(${(-bs*40).toFixed(1)} -22 110)`);O(E.bL,1-bs);
+  T(E.bR,`translate(${(bs*70).toFixed(1)} ${(bs*260).toFixed(1)}) rotate(${(bs*40).toFixed(1)} 22 110)`);O(E.bR,1-bs);O(E.tr2,p>.5&&p<.86?1:0);
+  const a=C((p-.46)/.22);T(E.s1,`translate(0 ${(a*700).toFixed(1)}) rotate(${(-a*35).toFixed(1)})`);O(E.s1,1-a*a);
+  const f=C((p-.7)/.14);
+  T(E.fl,`translate(${(-f*80).toFixed(1)} ${(f*80).toFixed(1)}) rotate(${(-f*60).toFixed(1)} 0 -62)`);O(E.fl,1-f);
+  T(E.fr,`translate(${(f*80).toFixed(1)} ${(f*80).toFixed(1)}) rotate(${(f*60).toFixed(1)} 0 -62)`);O(E.fr,1-f);O(E.fs,f>0?0:1);
+  const d=C((p-.9)/.08);T(E.s2,`translate(0 ${(d*200).toFixed(1)})`);O(E.s2,1-d*.85);
+  T(E.wings,`translate(0 -100) scale(${ease(d).toFixed(3)} 1)`);
+  $('tT').textContent=String(Math.floor(t/60)).padStart(2,'0')+':'+String(t%60).padStart(2,'0');
+  $('tA').textContent=Math.round(alt)+' km';$('tV').textContent=vel.toFixed(2)+' km/s';
+  $('tS').textContent=p<.46?'1':p<.9?'2':'Payload';
+  let n=ev[0][1];for(const [kk,nm] of ev)if(p>=kk)n=nm;$('tE').textContent=n;
+}
+let cur=0,goal=0,raf=0;
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+function tick(){cur+=(goal-cur)*(reduce?1:.14);if(Math.abs(goal-cur)<.0004)cur=goal;render(cur);raf=cur===goal?0:requestAnimationFrame(tick)}
+addEventListener('scroll',()=>{goal=target();if(!raf)raf=requestAnimationFrame(tick)},{passive:true});
+let roW=0;const ro=new ResizeObserver(()=>{const h=document.documentElement.scrollHeight;if(h!==roW){roW=h;layout()}});ro.observe(document.querySelector('main'));
+let lw=innerWidth,lh=innerHeight;
+addEventListener('resize',()=>{if(innerWidth!==lw||Math.abs(innerHeight-lh)>150){lw=innerWidth;lh=innerHeight;layout()}else{goal=target();if(!raf)raf=requestAnimationFrame(tick)}});
+layout();
+}
+
+</script>
+</body>
+</html>
